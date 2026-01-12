@@ -1,0 +1,51 @@
+\documentclass{article}
+\usepackage[shortcuts,todos,theorems]{tssuite}
+
+\DefineScNames{Test, Example}
+\DefineScName[Shorthand]{Short}
+\NewDocumentTheorem{TestTheorem}{Test Theorem}{}[numbered=true]
+\NewDocumentTheorem{TestLemma}{Test Lemma}{}[sibling=testtheorem]
+%[sibling=testtheorem]
+\begin{document}
+
+\section*{Minimal tssuite Test}
+
+\subsection*{Shortcut Test}
+\begin{verbatim}
+\DefineScNames{Test, Example}
+\DefineScName[Shorthand]{Short}
+\end{verbatim}
+Commands created: \Test, \Example, \Short.
+
+\subsection*{Todo Test}
+\todo{This is a test todo}
+\todo[inline]{Inline test todo}
+
+\subsection*{Theorem Test}
+\begin{verbatim}
+\NewDocumentTheorem{TestTheorem}{Test Theorem}
+\NewDocumentTheorem{TestLemma}{Test Lemma}[parent=testtheorem]
+\end{verbatim}
+\begin{testtheorem}[Test]
+This is a test theorem.
+\end{testtheorem}
+
+\begin{testtheorem}[Test 2]
+This is a test theorem.
+\end{testtheorem}
+
+\begin{testlemma}
+This is a test lemma.
+\end{testlemma}
+
+\begin{testlemma*}
+This is an another test lemma.
+\end{testlemma*}
+
+\subsection*{List Test}
+\begin{itemize}[compact]
+    \item Compact item 1
+    \item Compact item 2
+\end{itemize}
+
+\end{document}
