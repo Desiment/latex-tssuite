@@ -150,14 +150,14 @@
     
   \IfPackageLoadedTF{memoize}{%
 	\NewDocumentCommand{\MakeFramedTheorem}{mm}{
-    	\NewDocumentEnvironment{#1}{o}
-        	{\framesetup{##1}\begin{mdframed}\begin{#2}}
+		\NewDocumentEnvironment{#1}{oO{}}
+		{\framesetup{##1}\begin{mdframed}\begin{#2}[##2]}
         	{\end{#2}\end{mdframed}}
 	}
   }{%
 	\NewDocumentCommand{\MakeFramedTheorem}{mm}{
-    	\NewDocumentEnvironment{#1}{o}
-		{\mmzset{disabe}\framesetup{##1}\begin{mdframed}\begin{#2}}
+		\NewDocumentEnvironment{#1}{oO{}}
+		{\mmzset{disabe}\framesetup{##1}\begin{mdframed}\begin{#2}[##2]}
 		{\end{#2}\end{mdframed}\mmszet{enable}}
 	}
   }
