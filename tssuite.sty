@@ -44,16 +44,19 @@
 \newif\if@tssuite@shortcuts       % Enable shortcut commands for names/terms
 \newif\if@tssuite@todos           % Enable todo notes functionality
 \newif\if@tssuite@theorems        % Enable theorem environments
+\newif\if@tssuite@framedtheorems        % Enable theorem environments
 
 % Initialize all options to false by default
 \@tssuite@shortcutsfalse
 \@tssuite@todosfalse
 \@tssuite@theoremsfalse
+\@tssuite@framedtheorems        % Enable theorem environments
 
 % Process user options
 \DeclareOption{shortcuts}{\@tssuite@shortcutstrue}
 \DeclareOption{todos}{\@tssuite@todostrue}
 \DeclareOption{theorems}{\@tssuite@theoremstrue}
+\DeclareOption{framedtheorems}{\@tssuite@theoremstrue\@tssuite@framedtheoremstrue}
 \DeclareOption*{\PackageWarning{tssuite}{Unknown option '\CurrentOption'}}
 \ProcessOptions\relax
 
@@ -114,12 +117,18 @@
   \RequirePackage{keytheorems}      % Enhanced theorem management
   
   % Unified theorem creation command
-  % \NewDocumentTheorem{Theorem}{name}{options}[numbered ver. options](unnumbered ver. options)
+  \NewDocumentCommand{\NewNumberedTheorem}{mmO{}}{
+	  \newkeytheorem{#1}[name=#2, #3]
+  }
+  \NewDocumentCommand{\NewStarredTheorem}{mO{}}{
+	  \newkeytheorem{#1}[name=#2, numbered = false, #3]
+  }
+  % \NewDocumentTheorem{Theorem}{name}[options][numbered ver. options][unnumbered ver. options]
   % Creates: theorem environment (numbered) and theorem* environment (unnumbered)
-  % Note that for consistency, environment name is converted to lowercase
+  % TODO: add more correct handling of options
   \ExplSyntaxOn
-  \NewDocumentCommand{\NewDocumentTheorem}{mmmd[]d()}{
-	\tl_set:Nn\l_env_name_tl{\str_lowercase:n{#1}}
+  \NewDocumentCommand{\NewDocumentTheorem}{mmO{}d[]d[]}{
+	\tl_set:Nn\l_env_name_tl{#1}
 	\IfNoValueTF{#4}{
 	  \exp_args:Nf\newkeytheorem{\tl_use:N\l_env_name_tl}[name=#2, #3]
 	}{
@@ -133,34 +142,35 @@
   }
   \ExplSyntaxOff
 
-
-  \RequirePackage{mdframed}
-  \NewDocumentCommand{\framesetup}{m}{
-    \IfNoValueTF{#1}{
-        \mdfsetup{innertopmargin=-3pt,linecolor=black,%
-              linewidth=1pt,topline=true, frametitleaboveskip=\dimexpr-\ht\strutbox\relax,}
-    }{
-        \mdfsetup{frametitle={%
-            \tikz[baseline=(current bounding box.east),outer sep=0pt]
-            \node[anchor=east,rectangle,fill=white]{\strut #1};}}
-        \mdfsetup{innertopmargin=-10pt,linecolor=black,%
-              linewidth=1pt,topline=true, frametitleaboveskip=\dimexpr-\ht\strutbox\relax,}
-    }
-  }
-    
-  \IfPackageLoadedTF{memoize}{%
-	\NewDocumentCommand{\MakeFramedTheorem}{mm}{
-		\NewDocumentEnvironment{#1}{oO{}}
-		{\framesetup{##1}\begin{mdframed}\begin{#2}[##2]}
-        	{\end{#2}\end{mdframed}}
-	}
-  }{%
-	\NewDocumentCommand{\MakeFramedTheorem}{mm}{
-		\NewDocumentEnvironment{#1}{oO{}}
-		{\mmzset{disabe}\framesetup{##1}\begin{mdframed}\begin{#2}[##2]}
-		{\end{#2}\end{mdframed}\mmszet{enable}}
-	}
-  }
+  \if@tssuite@framedtheorems        % Enable theorem environments
+	  \RequirePackage{mdframed}
+	  \NewDocumentCommand{\framesetup}{m}{
+		\IfNoValueTF{#1}{
+			\mdfsetup{innertopmargin=-3pt,linecolor=black,%
+				  linewidth=1pt,topline=true, frametitleaboveskip=\dimexpr-\ht\strutbox\relax,}
+		}{
+			\mdfsetup{frametitle={%
+				\tikz[baseline=(current bounding box.east),outer sep=0pt]
+				\node[anchor=east,rectangle,fill=white]{\strut #1};}}
+			\mdfsetup{innertopmargin=-10pt,linecolor=black,%
+				  linewidth=1pt,topline=true, frametitleaboveskip=\dimexpr-\ht\strutbox\relax,}
+		}
+	  }
+		
+	  \IfPackageLoadedTF{memoize}{%
+		\NewDocumentCommand{\MakeFramedTheorem}{mm}{
+			\NewDocumentEnvironment{#1}{oO{}}
+			{\framesetup{##1}\begin{mdframed}\begin{#2}[note=##1, ##2]}
+				{\end{#2}\end{mdframed}}
+		}
+	  }{%
+		\NewDocumentCommand{\MakeFramedTheorem}{mm}{
+			\NewDocumentEnvironment{#1}{oO{}}
+			{\mmzset{disabe}\framesetup{##1}\begin{mdframed}\begin{#2}[##2]}
+			{\end{#2}\end{mdframed}\mmszet{enable}}
+		}
+	  }
+  \fi
 \fi
 
 \endinput
