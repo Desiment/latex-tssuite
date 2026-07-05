@@ -1,0 +1,106 @@
+% LTeX: enabled=false
+% ==============================================================================
+% SHORTCUT COMMANDS
+% ==============================================================================
+% Provides \DefineScName and \DefineScNames to quickly define commands that
+% render their content in \textsc. The command name is derived automatically
+% from the text (e.g. "Lorem Ipsum" becomes \LoremIpsum) or can be specified
+% explicitly.
+% ==============================================================================
+
+\ExplSyntaxOn
+
+% -----------------------------------------------------------------------
+% Internal message
+% -----------------------------------------------------------------------
+
+% tssuite sc-command-already-defined: raised when trying to define a
+%   small-caps command whose name is already taken.
+\msg_new:nnn{tssuite}{sc-command-already-defined}
+  {SC~command~'#1'~is~already~defined.}
+
+% -----------------------------------------------------------------------
+% Internal variables
+% -----------------------------------------------------------------------
+
+% Accumulates the derived command name from concatenated words.
+\tl_new:N \l__tssuite_sc_cmd_tl
+
+% Holds the full original text to display in \textsc.
+\tl_new:N \l__tssuite_sc_text_tl
+
+% Holds the space-split parts of the input text.
+\seq_new:N \l__tssuite_sc_parts_seq
+
+% -----------------------------------------------------------------------
+% Internal functions
+% -----------------------------------------------------------------------
+
+% \tssuite_define_sc_command:Nn <cs> <text>
+%   Define <cs> as a parameterless command that prints <text> in \textsc.
+%   #1 - control sequence token (e.g. \loremipsum)
+%   #2 - text to render in small caps
+\cs_new_protected:Npn \tssuite_define_sc_command:Nn #1 #2 {
+  \cs_if_exist:NTF #1 {
+    \msg_error:nnn {tssuite} {sc-command-already-defined} {\token_to_str:N #1}
+  } {
+    \NewDocumentCommand #1 { } {\textsc{#2}}
+  }
+}
+
+% \tssuite_define_sc_command:cn <cs name> <text>
+%   Like \tssuite_define_sc_command:Nn but takes the command name as a string.
+%   #1 - command name as a string (e.g. "loremipsum")
+%   #2 - text to render in small caps
+\cs_new_protected:Npn \tssuite_define_sc_command:cn #1 #2 {
+  \cs_if_exist:cTF {#1} {
+    \msg_error:nnn {tssuite} {sc-command-already-defined} {#1}
+  } {
+    \exp_args:Nc \NewDocumentCommand {#1} { } {\textsc{#2}}
+  }
+}
+
+% \tssuite_make_sc_name_command:n <text>
+%   Derive a command name from <text> by concatenating non-blank words,
+%   then define that command to render <text> in \textsc.
+%   #1 - full text (e.g. "Lorem Ipsum" → \LoremIpsum)
+\cs_new_protected:Npn \tssuite_make_sc_name_command:n #1 {
+  \tl_set:Nn \l__tssuite_sc_text_tl {#1}
+  \tl_trim_spaces:N \l__tssuite_sc_text_tl
+  \seq_set_split:NnV \l__tssuite_sc_parts_seq {~} \l__tssuite_sc_text_tl
+  \tl_clear:N \l__tssuite_sc_cmd_tl
+  \seq_map_inline:Nn \l__tssuite_sc_parts_seq {
+    \tl_if_blank:nF {##1} {
+      \tl_put_right:Nn \l__tssuite_sc_cmd_tl {##1}
+    }
+  }
+  \exp_args:NVV \tssuite_define_sc_command:cn
+    \l__tssuite_sc_cmd_tl
+    \l__tssuite_sc_text_tl
+}
+
+% -----------------------------------------------------------------------
+% User commands
+% -----------------------------------------------------------------------
+
+% \DefineScName[<cmd>]{<text>}
+%   Define a new small-caps command.
+%   If the optional <cmd> is omitted, the command name is derived from <text>
+%   by concatenating its space-separated words (e.g. "Foo Bar" → \FooBar).
+%   #1 - (optional) explicit command to define
+%   #2 - text to render in \textsc
+\NewDocumentCommand \DefineScName { o m } {
+  \IfNoValueTF {#1}
+    {\tssuite_make_sc_name_command:n {#2}}
+    {\tssuite_define_sc_command:Nn #1 {#2}}
+}
+
+% \DefineScNames{<csv>}
+%   Define multiple small-caps commands from a comma-separated list of texts.
+%   Each entry follows the auto-naming rule of \DefineScName (no optional arg).
+%   #1 - comma-separated list of texts, e.g. {Foo Bar, Baz Qux}
+\NewDocumentCommand \DefineScNames { >{\SplitList{,}} m } {
+  \ProcessList {#1} {\tssuite_make_sc_name_command:n}
+}
+
+\ExplSyntaxOff

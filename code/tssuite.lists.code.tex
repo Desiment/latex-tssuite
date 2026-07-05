@@ -1,0 +1,19 @@
+% ==============================================================================
+% LISTS CONFIGURATION
+% ==============================================================================
+% Provides predefined \SetEnumitemKey shortcuts for use with enumitem lists.
+% These keys can be passed as options to itemize, enumerate, or description
+% environments to quickly apply common formatting.
+% ==============================================================================
+
+% \SetEnumitemKey{compact}{...}
+%   Removes all vertical spacing between items.
+\SetEnumitemKey{compact}{topsep=0pt,parsep=0pt,noitemsep}
+
+% \SetEnumitemKey{widemargins}{...}
+%   Increases left margin and label indentation for readability.
+\SetEnumitemKey{widemargins}{leftmargin=2em,labelindent=1em,labelsep=0.5em}
+
+% \SetEnumitemKey{inline}{...}
+%   Formats a list as inline, items separated by \quad.
+\SetEnumitemKey{inline}{itemjoin=\quad,before=\unskip\space,after=\unskip}

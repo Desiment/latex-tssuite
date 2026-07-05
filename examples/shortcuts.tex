@@ -1,0 +1,52 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=2.7cm]{geometry}
+\setlength{\marginparwidth}{2cm}
+\usepackage[shortcuts]{tssuite}
+
+\title{\texttt{tssuite} Shortcut Examples}
+\author{Focused example}
+\date{\today}
+
+\DefineScName[\Cpp]{C++}
+\DefineScName[\LatexThree]{LaTeX3}
+\DefineScName{GitHub}
+\DefineScName{Visual Studio Code}
+\DefineScNames{Python, Rust, LuaLaTeX}
+
+\begin{document}
+
+\maketitle
+
+This document loads \texttt{tssuite} with the \texttt{shortcuts} option. The
+option enables commands that define small-caps names once and reuse them in the
+document body.
+
+\section{Explicit Command Names}
+
+When the printed text is not a good control-sequence name, provide the command
+explicitly.
+
+\begin{verbatim}
+\DefineScName[\Cpp]{C++}
+\DefineScName[\LatexThree]{LaTeX3}
+\end{verbatim}
+
+The resulting commands print as \Cpp{} and \LatexThree.
+
+\section{Generated Command Names}
+
+When the text can form a command name, omit the optional argument.
+
+\begin{verbatim}
+\DefineScName{GitHub}
+\DefineScName{Visual Studio Code}
+\DefineScNames{Python, Rust, LuaLaTeX}
+\end{verbatim}
+
+The generated commands print as \GitHub, \VisualStudioCode, \Python, \Rust, and
+\LuaLaTeX.
+
+\end{document}

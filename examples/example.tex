@@ -1,0 +1,383 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=2.7cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\usepackage[
+  shortcuts,
+  theorems,
+  draft,
+  todoextension=5cm,
+  framedtheorems
+]{tssuite}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  urlcolor=blue!60!black
+}
+
+\title{\texttt{tssuite}: a small text utility package}
+\author{Example document and informal guide}
+\date{\today}
+
+% ------------------------------------------------------------------------------
+% Example definitions used below
+% ------------------------------------------------------------------------------
+
+\DefineScName[\Cpp]{C++}
+\DefineScName[\LatexThree]{LaTeX3}
+\DefineScName{GitHub}
+\DefineScName{Visual Studio Code}
+\DefineScNames{Python, Rust, LuaLaTeX}
+
+\CreateTextField{\AuthorName}{author}
+\CreateTextField{\ProjectTitle}{project}
+\CreateTextField{\DocumentVersion}{version}
+
+\AuthorName{Alice Example}
+\ProjectTitle{tssuite demonstration}
+\DocumentVersion{0.3}
+
+\NewNumberedTheorem{theorem}{Theorem}
+\NewNumberedTheorem{lemma}{Lemma}
+\NewStarredTheorem{remark}{Remark}
+\NewDocumentTheorem{definition}{Definition}
+
+\MakeFramedTheorem{ftheorem}{theorem}
+\MakeFramedTheorem{fdefinition}{definition}
+
+\NewNumberedTheorem{sectiontheorem}{Section Theorem}[parent=section]
+\NewNumberedTheorem{sharedlemma}{Shared Lemma}[sibling=theorem]
+\NewNumberedTheorem{plainexample}{Plain Example}[style=definition]
+
+% ------------------------------------------------------------------------------
+% Local helpers for this document only
+% ------------------------------------------------------------------------------
+
+\newcommand{\pkg}[1]{\texttt{#1}}
+\newcommand{\cs}[1]{\texttt{\textbackslash#1}}
+
+\newenvironment{codeblock}
+  {\begin{quote}\small\begin{verbatim}}
+  {\end{verbatim}\end{quote}}
+
+\begin{document}
+
+\maketitle
+
+This document is meant to be read as a simple introduction to the
+\pkg{tssuite} package.  It is not a formal reference manual.  Instead, it shows
+the usual commands in context and explains the intended workflow in ordinary
+text.  The package collects a few small helpers that are useful in longer
+documents: compact list styles, small-caps shortcuts, named text fields, todo
+notes, theorem declarations, and optionally framed theorem environments.
+
+To use the full package, load it like this:
+
+\begin{verbatim}
+\usepackage[
+  shortcuts,
+  draft,
+  todoextension=5cm,
+  theorems,
+  framedtheorems
+]{tssuite}
+\end{verbatim}
+
+Build this example from the \texttt{examples} directory with
+\texttt{latexmk -r latexmkrc example.tex}.  The build configuration keeps
+auxiliary files in \texttt{.build/} and writes the final PDF beside this source
+file.
+
+The options can also be used separately.  The \verb|shortcuts| option enables
+commands such as \verb|\DefineScName| and \verb|\DefineScNames|.  The
+\verb|draft| option loads todo-note support and extends both sides of the page
+to accommodate margin notes; the per-side extension width is controlled by the
+\verb|todoextension| option (default \texttt{5\,cm}).  The \verb|theorems|
+option enables the theorem declaration helpers.  The \verb|framedtheorems|
+option enables framed theorem wrappers and also turns on theorem support.
+
+The package defines a few list styles for \pkg{enumitem}.  They are used as
+ordinary list options.  The most common one is \verb|compact|, which removes
+extra vertical spacing:
+
+\begin{verbatim}
+\begin{itemize}[compact]
+  \item first item
+  \item second item
+\end{itemize}
+\end{verbatim}
+
+For example:
+
+\begin{itemize}[compact]
+  \item first item;
+  \item second item;
+  \item third item.
+\end{itemize}
+
+There is also \verb|widemargins|, useful when a list should have a little more
+visual structure:
+
+\begin{enumerate}[widemargins]
+  \item This item has more generous indentation.
+  \item This style can make longer lists easier to scan.
+\end{enumerate}
+
+Small-caps shortcuts are useful when the same names or technical terms appear
+many times in a document.  Instead of writing \verb|\textsc{...}| repeatedly,
+define the name once in the preamble.  When the printed text is not a good
+command name, pass the command explicitly:
+
+\begin{verbatim}
+\DefineScName[\Cpp]{C++}
+\DefineScName[\LatexThree]{LaTeX3}
+\end{verbatim}
+
+These declarations create \verb|\Cpp| and \verb|\LatexThree|.  In the document
+they print as \Cpp{} and \LatexThree.  When the text itself can be used to form
+a command name, omit the optional argument:
+
+\begin{verbatim}
+\DefineScName{GitHub}
+\DefineScName{Visual Studio Code}
+\end{verbatim}
+
+This creates \verb|\GitHub| and \verb|\VisualStudioCode|, which print as
+\GitHub{} and \VisualStudioCode.  The package preserves the capitalization of
+the original text when creating the command name.  Several names can be declared
+at once:
+
+\begin{verbatim}
+\DefineScNames{Python, Rust, LuaLaTeX}
+\end{verbatim}
+
+This creates \verb|\Python|, \verb|\Rust|, and \verb|\LuaLaTeX|, which print as
+\Python, \Rust, and \LuaLaTeX.
+
+Text fields provide a small mechanism for storing and reusing named pieces of
+text.  A field is created with a setter command and a field name:
+
+\begin{verbatim}
+\CreateTextField{\AuthorName}{author}
+\CreateTextField{\ProjectTitle}{project}
+\CreateTextField{\DocumentVersion}{version}
+\end{verbatim}
+
+The first argument is the command that will later set the value.  The second
+argument is the field name used when printing the value.  After declaring the
+fields, assign values like this:
+
+\begin{verbatim}
+\AuthorName{Alice Example}
+\ProjectTitle{tssuite demonstration}
+\DocumentVersion{0.3}
+\end{verbatim}
+
+The values can then be printed anywhere with \verb|\PrintTextField|.  For
+example, this document currently has author
+\PrintTextField{author}, project title \PrintTextField{project}, and version
+\PrintTextField{version}.  A field can be updated later simply by calling its
+setter command again.  For instance, after
+
+\begin{verbatim}
+\DocumentVersion{0.4}
+\end{verbatim}
+
+the printed version changes from the previous value to the new one.
+
+\DocumentVersion{0.4}
+
+The current version is now \PrintTextField{version}.  This is useful for
+metadata such as author names, project titles, version numbers, course names,
+or report identifiers.
+
+Todo notes are available in \verb|draft| mode.  The \verb|todoextension| key
+adds room on each side of the page; the default is \texttt{5\,cm}.  They use
+the usual
+\pkg{todonotes} command:
+
+\begin{verbatim}
+\todo{Rewrite this paragraph later.}
+\end{verbatim}
+
+Here is a sample todo note:
+
+\todo{Rewrite this paragraph later.}
+
+The theorem helpers are designed to make declarations short and consistent.
+A numbered theorem is declared with:
+
+\begin{verbatim}
+\NewNumberedTheorem{theorem}{Theorem}
+\end{verbatim}
+
+After that, the environment can be used normally:
+
+\begin{theorem}
+If $a=b$ and $b=c$, then $a=c$.
+\end{theorem}
+
+Another numbered environment can be created in the same way:
+
+\begin{verbatim}
+\NewNumberedTheorem{lemma}{Lemma}
+\end{verbatim}
+
+\begin{lemma}
+If $x>0$ and $y>0$, then $x+y>0$.
+\end{lemma}
+
+For unnumbered theorem-like material, use:
+
+\begin{verbatim}
+\NewStarredTheorem{remark}{Remark}
+\end{verbatim}
+
+\begin{remark}
+This is an unnumbered remark.  It is useful for comments, explanations, or
+observations that should not participate in theorem numbering.
+\end{remark}
+
+The command \verb|\NewDocumentTheorem| creates a paired theorem environment:
+one numbered form and one unnumbered starred form.  For example,
+
+\begin{verbatim}
+\NewDocumentTheorem{definition}{Definition}
+\end{verbatim}
+
+creates both \verb|definition| and \verb|definition*|.
+
+\begin{definition}
+A prime number is a positive integer greater than $1$ with exactly two positive
+divisors.
+\end{definition}
+
+When \verb|framedtheorems| is enabled, existing theorem environments can be
+wrapped in frames.  First define the ordinary theorem environment, then define
+a framed wrapper:
+
+\begin{verbatim}
+\MakeFramedTheorem{ftheorem}{theorem}
+\MakeFramedTheorem{fdefinition}{definition}
+\end{verbatim}
+
+The first argument is the new framed environment.  The second argument is the
+already existing theorem-like environment that should be placed inside the
+frame.
+
+\begin{ftheorem}
+For every integer $n$, if $n$ is even, then $n^2$ is even.
+\end{ftheorem}
+
+A framed theorem may also have a title:
+
+\begin{ftheorem}[Transitivity]
+If $x<y$ and $y<z$, then $x<z$.
+\end{ftheorem}
+
+The same idea works for definitions:
+
+\begin{fdefinition}[Group]
+A group is a set $G$ together with a binary operation satisfying associativity,
+identity, and inverses.
+\end{fdefinition}
+
+The theorem commands in \pkg{tssuite} pass their optional key list directly to
+\pkg{keytheorems}.  This means ordinary \pkg{keytheorems} options such as
+\verb|parent=section|, \verb|sibling=theorem|, and \verb|style=definition| can be
+used through the shorter wrapper commands.
+
+For example, this theorem is numbered inside the current section:
+
+\begin{sectiontheorem}[note=Section-local numbering,label=thm:section-local]
+The number of this theorem includes the section number.
+\end{sectiontheorem}
+
+The next environment shares the counter of the ordinary theorem environment:
+
+\begin{sharedlemma}[note=Shared counter]
+This lemma uses the same counter sequence as \verb|theorem|.
+\end{sharedlemma}
+
+The next example uses the \verb|definition| style, so its body is upright rather
+than italic.
+
+\begin{plainexample}[note=Definition-style body]
+This is useful for examples, definitions, and other explanatory material.
+\end{plainexample}
+
+The optional argument of a theorem can also use key-value syntax.  Here we set a
+label and a note at the same time:
+
+\begin{theorem}[label=thm:label-test,note=A labelled theorem]
+This theorem can be referenced later.
+\end{theorem}
+
+For example, Theorem~\ref{thm:label-test} was labelled using a key in the
+optional argument.
+
+The \verb|store| key can be used to save a theorem and print it again later.  This
+may require compiling the document more than once.
+
+\begin{theorem}[store=stored-demo,note=Stored theorem]
+This theorem is stored by \pkg{keytheorems} and can be retrieved later.
+\end{theorem}
+
+Here is the stored theorem again:
+
+\getkeytheorem{stored-demo}
+
+Finally, \pkg{keytheorems} can produce a list of theorem-like environments:
+
+\listofkeytheorems[title={Theorems appearing in this example}]
+
+
+
+In ordinary use, a document preamble might look like this:
+
+\begin{verbatim}
+\usepackage[shortcuts,theorems,framedtheorems]{tssuite}
+
+\DefineScName[\Cpp]{C++}
+\DefineScName{GitHub}
+\DefineScNames{Python, Rust, LuaLaTeX}
+
+\CreateTextField{\AuthorName}{author}
+\CreateTextField{\ProjectTitle}{project}
+
+\AuthorName{Alice Example}
+\ProjectTitle{My Project}
+
+\NewNumberedTheorem{theorem}{Theorem}
+\NewDocumentTheorem{definition}{Definition}
+\MakeFramedTheorem{ftheorem}{theorem}
+\end{verbatim}
+
+Then the body of the document can simply use the commands that were declared in
+the preamble.  For example, it can mention \Cpp, \GitHub, and \Python without
+repeating formatting decisions, print the project name with
+\verb|\PrintTextField{project}|, and use theorem environments without repeating
+setup code.
+
+The package performs basic safety checks.  If a field is created twice, an error
+is reported.  If a field is printed before it exists, an error is reported.  If
+a shortcut command already exists, the package reports that instead of silently
+overwriting it.  These checks are intended to make mistakes visible early,
+especially in larger documents where definitions may be split across several
+files.
+
+The most useful habit is to put all package-level declarations near the top of
+the preamble.  Define shortcuts first, then text fields, then theorem
+environments.  Use framed theorem wrappers only for environments that need extra
+visual emphasis.  For small documents, loading only the options you need keeps
+the setup simple.  For lecture notes, reports, or technical manuals, using all
+features together can make the source more consistent and easier to maintain.
+
+\end{document}

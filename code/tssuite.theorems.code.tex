@@ -1,0 +1,157 @@
+% ==============================================================================
+% THEOREM ENVIRONMENTS
+% ==============================================================================
+% Provides three theorem-creation commands wrapping keytheorems:
+%   \NewNumberedTheorem  — numbered theorem
+%   \NewStarredTheorem   — unnumbered theorem
+%   \NewDocumentTheorem  — both numbered and starred variants at once
+%
+% When the framedtheorems package option is active, also loads mdframed,
+% tikz, and pgf, and provides \framesetup and \MakeFramedTheorem for
+% wrapping theorems in mdframed boxes.
+% ==============================================================================
+
+% -----------------------------------------------------------------------
+% \NewNumberedTheorem{<cmd>}{<display name>}[<options>]
+%   Create a numbered theorem environment via \newkeytheorem.
+%   #1 - environment command to define (e.g. \theorem)
+%   #2 - human-readable display name (e.g. Theorem)
+%   #3 - (optional) key-value options passed to \newkeytheorem
+\NewDocumentCommand\NewNumberedTheorem{mmO{}}{
+  \newkeytheorem{#1}[name={#2},#3]
+}
+
+% -----------------------------------------------------------------------
+% \NewStarredTheorem{<cmd>}{<display name>}[<options>]
+%   Create an unnumbered (starred) theorem environment via \newkeytheorem.
+%   #1 - environment command to define
+%   #2 - human-readable display name
+%   #3 - (optional) key-value options passed to \newkeytheorem
+\NewDocumentCommand\NewStarredTheorem{mmO{}}{
+  \newkeytheorem{#1}[name={#2},numbered=false,#3]
+}
+
+% -----------------------------------------------------------------------
+% \NewDocumentTheorem{<cmd>}{<display name>}[<opts>][<num opts>][<star opts>]
+%   Create both numbered (#1) and starred (#1*) theorem environments in one
+%   call. Separate option sets can be supplied for each variant.
+%   #1 - base environment command (e.g. \theorem; starred becomes \theorem*)
+%   #2 - human-readable display name
+%   #3 - (optional) key-value options common to both variants
+%   #4 - (optional) key-value options for the numbered variant only
+%   #5 - (optional) key-value options for the starred variant only
+\NewDocumentCommand\NewDocumentTheorem{mmO{}d[]d[]}{
+  \IfNoValueTF{#4}
+    {\newkeytheorem{#1}[name={#2},#3]}
+    {\newkeytheorem{#1}[name={#2},#4,#3]}
+  \IfNoValueTF{#5}
+    {\newkeytheorem{#1*}[name={#2},numbered=false,#3]}
+    {\newkeytheorem{#1*}[name={#2},numbered=false,#5,#3]}
+}
+
+% ==============================================================================
+% FRAMED THEOREMS (conditional on framedtheorems option)
+% ==============================================================================
+
+\if@tssuite@framedtheorems
+\ExplSyntaxOn
+
+% -----------------------------------------------------------------------
+% Redefine memoize stubs (forward-declared in tssuite.sty)
+% -----------------------------------------------------------------------
+
+% When memoize is loaded, disable it during mdframed rendering to avoid
+% caching issues with tikz pictures inside framed theorems.
+\IfPackageLoadedTF{memoize}{
+  \cs_set_protected:Npn\tssuite_memoize_disable:{\mmzset{disable}}
+  \cs_set_protected:Npn\tssuite_memoize_enable:{\mmzset{enable}}
+}{
+  \cs_set_protected:Npn\tssuite_memoize_disable:{}
+  \cs_set_protected:Npn\tssuite_memoize_enable:{}
+}
+
+% -----------------------------------------------------------------------
+% Internal functions
+% -----------------------------------------------------------------------
+
+% \tssuite_framesetup:n <title>
+%   Configure mdframed appearance. When <title> is blank, a simple frame
+%   with no title is set up. When <title> is provided, a tikz node is
+%   attached as the frametitle.
+%   #1 - frame title text (blank = no title)
+\cs_new_protected:Npn\tssuite_framesetup:n#1{
+  \tl_if_blank:nTF{#1}
+    {
+      \mdfsetup{
+        innertopmargin=-3pt,
+        linecolor=black,
+        linewidth=1pt,
+        topline=true,
+        frametitleaboveskip=\dimexpr-\ht\strutbox\relax
+      }
+    }
+    {
+      \mdfsetup{
+        frametitle={
+          \tikz[baseline=(current~bounding~box.east),outer~sep=0pt]
+            \node[anchor=east,rectangle,fill=white]{\strut #1};
+        }
+      }
+      \mdfsetup{
+        innertopmargin=-10pt,
+        linecolor=black,
+        linewidth=1pt,
+        topline=true,
+        frametitleaboveskip=\dimexpr-\ht\strutbox\relax
+      }
+    }
+}
+
+% -----------------------------------------------------------------------
+% User commands
+% -----------------------------------------------------------------------
+
+% \framesetup{<title>}
+%   User-level wrapper for \tssuite_framesetup:n.
+%   #1 - frame title text (blank = no title)
+\NewDocumentCommand\framesetup{m}{
+  \tssuite_framesetup:n{#1}
+}
+
+% -----------------------------------------------------------------------
+% \MakeFramedTheorem{<env>}{<theorem cmd>}
+%   Create a new environment <env> that wraps an existing theorem
+%   (defined via \NewNumberedTheorem or similar) inside an mdframed box.
+%
+%   Usage:
+%     \begin{<env>}[<frame title>][<theorem options>]
+%       ...
+%     \end{<env>}
+%
+%   #1 - new environment name (e.g. framedtheorem)
+%   #2 - existing theorem command (e.g. \theorem)
+\NewDocumentCommand\MakeFramedTheorem{mm}{
+  \NewDocumentEnvironment{#1}{oO{}}
+    {
+      \tssuite_memoize_disable:
+      \IfNoValueTF{##1}
+        {
+          \framesetup{}
+          \begin{mdframed}
+          \begin{#2}[##2]
+        }
+        {
+          \framesetup{##1}
+          \begin{mdframed}
+          \begin{#2}[note=##1,##2]
+        }
+    }
+    {
+      \end{#2}
+      \end{mdframed}
+      \tssuite_memoize_enable:
+    }
+}
+
+\ExplSyntaxOff
+\fi

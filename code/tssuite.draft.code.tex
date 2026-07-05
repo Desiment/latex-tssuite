@@ -1,0 +1,74 @@
+% ==============================================================================
+% DRAFT MODE
+% ==============================================================================
+% Two responsibilities when the draft option is active:
+%
+% 1. EXTEND THE PHYSICAL PAGE to make room for margin todo notes.  The
+%    extension width is controlled by the todoextension package option
+%    (default: 5\,cm) and is added to both sides of the page.  The logical
+%    page is centered in the wider physical page, and the marginpar area is
+%    adjusted so that \todo notes from the todonotes package render in the
+%    newly available right-side space.
+%
+% 2. OVERRIDE \todo TO DISABLE MEMOIZE during rendering.  This prevents
+%    memoize from caching partial/temporary todo note output and ensures
+%    notes are always regenerated.  If the memoize package is not loaded,
+%    the override is omitted and the original \todo from todonotes is
+%    used as-is.
+% ==============================================================================
+
+\newlength{\DTM@extra}
+\setlength{\DTM@extra}{\@tssuite@todoextension}
+
+\newlength{\DTM@physicalpaperwidth}
+\newlength{\DTM@oldrightmargin}
+
+\newcommand{\DTM@fixmarginpar}{%
+  \setlength{\DTM@oldrightmargin}{%
+    \dimexpr\paperwidth
+      - 1in
+      - \hoffset
+      - \oddsidemargin
+      - \textwidth
+    \relax
+  }%
+  \setlength{\marginparsep}{\DTM@oldrightmargin}%
+  \setlength{\marginparwidth}{\DTM@extra}%
+}
+
+\newcommand{\DTM@setphysicalpage}{%
+  \setlength{\DTM@physicalpaperwidth}{%
+    \dimexpr\paperwidth+2\DTM@extra\relax
+  }%
+  \ifPDFTeX
+    \global\pdfpagewidth=\DTM@physicalpaperwidth
+    \global\pdfpageheight=\paperheight
+  \else\ifLuaTeX
+    \global\pagewidth=\DTM@physicalpaperwidth
+    \global\pageheight=\paperheight
+  \else\ifXeTeX
+    \special{papersize=\the\DTM@physicalpaperwidth,\the\paperheight}%
+  \fi\fi\fi
+}
+
+\newcommand{\DTM@centerphysicalpage}{%
+  \setbox\ShipoutBox=\hbox{\kern\DTM@extra\box\ShipoutBox}%
+}
+
+\AtBeginDocument{\DTM@fixmarginpar}
+
+\AddToHook{shipout/before}{\DTM@setphysicalpage\DTM@centerphysicalpage}
+\AddToHook{cmd/newgeometry/after}{\DTM@fixmarginpar}
+\AddToHook{cmd/restoregeometry/after}{\DTM@fixmarginpar}
+
+% \todo[<options>]{<text>}
+%   Overridden to run inside \mmzset{disable}...\mmzset{enable} when the
+%   memoize package is present.
+\IfPackageLoadedTF{memoize}{
+  \NewCommandCopy\LaTeXtodo\todo
+  \RenewDocumentCommand\todo{om}{
+    \IfNoValueTF{#1}
+      {\bgroup\mmzset{disable}\LaTeXtodo{#2}\egroup}
+      {\bgroup\mmzset{disable}\LaTeXtodo[#1]{#2}\egroup}
+  }
+}{}

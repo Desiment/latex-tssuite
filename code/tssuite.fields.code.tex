@@ -1,0 +1,62 @@
+% ==============================================================================
+% TEXT FIELDS
+% ==============================================================================
+% Provides \CreateTextField and \PrintTextField to define and retrieve named
+% text storage fields. Fields are stored as global tl variables and can be set
+% via a user-defined command and retrieved by name.
+% ==============================================================================
+
+\ExplSyntaxOn
+
+% -----------------------------------------------------------------------
+% Internal messages
+% -----------------------------------------------------------------------
+
+% tssuite field-already-defined: raised when \CreateTextField is called with
+%   a name that is already in use.
+\msg_new:nnn{tssuite}{field-already-defined}
+  {Field~'#1'~is~already~defined.}
+
+% tssuite command-already-defined: raised when \CreateTextField is called with
+%   a command token that is already defined.
+\msg_new:nnn{tssuite}{command-already-defined}
+  {Command~'#1'~is~already~defined.}
+
+% tssuite unknown-field: raised when \PrintTextField is called with a name
+%   that has not been registered.
+\msg_new:nnn{tssuite}{unknown-field}
+  {Field~'#1'~is~not~defined.}
+
+% -----------------------------------------------------------------------
+% \CreateTextField{<cmd>}{<name>}
+%   Define <cmd> as a user command that sets the value of a named field.
+%   The field is internally stored in \g_tssuite_field_<name>_tl.
+%   #1 - command to define, e.g. \authors
+%   #2 - storage key used by \PrintTextField, e.g. authors
+\NewDocumentCommand\CreateTextField{mm}{
+  \tl_if_exist:cTF{g_tssuite_field_#2_tl}
+    {\msg_error:nnn{tssuite}{field-already-defined}{#2}}
+    {
+      \cs_if_exist:NTF#1
+        {\msg_error:nnn{tssuite}{command-already-defined}{\token_to_str:N#1}}
+        {
+          \tl_new:c{g_tssuite_field_#2_tl}
+          \tl_set:cn{g_tssuite_field_#2_tl}{#2}
+          \NewDocumentCommand#1{m}{
+            \tl_set:cn{g_tssuite_field_#2_tl}{##1}
+          }
+        }
+    }
+}
+
+% -----------------------------------------------------------------------
+% \PrintTextField{<name>}
+%   Retrieve and print the stored value for a named field.
+%   #1 - storage key previously given to \CreateTextField
+\NewDocumentCommand\PrintTextField{m}{
+  \tl_if_exist:cTF{g_tssuite_field_#1_tl}
+    {\tl_use:c{g_tssuite_field_#1_tl}}
+    {\msg_error:nnn{tssuite}{unknown-field}{#1}}
+}
+
+\ExplSyntaxOff

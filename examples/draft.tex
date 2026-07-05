@@ -1,0 +1,37 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=2.7cm]{geometry}
+\setlength{\marginparwidth}{2cm}
+\usepackage[draft,todoextension=4cm]{tssuite}
+
+\title{\texttt{tssuite} Draft Examples}
+\author{Focused example}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+This document loads \texttt{tssuite} with the \texttt{draft} option. Draft mode
+loads \texttt{todonotes}, extends the physical page by the configured
+\texttt{todoextension}, and leaves margin room for todo notes.
+
+\section{Todo Notes}
+
+Todo notes use the ordinary \verb|\todo| command from \texttt{todonotes}.
+
+\todo{Rewrite this introduction after the theorem section is stable.}
+
+This paragraph has a margin note attached. The logical text block remains the
+same size, while the PDF page is widened so the note has room at the right side.
+The example uses a smaller extension than the main guide so the output remains
+compact.
+
+\todo[color=yellow!30]{Check terminology before release.}
+
+Multiple notes can be used on one page, and ordinary document text continues to
+flow in the original layout.
+
+\end{document}
