@@ -40,18 +40,18 @@ Available options:
 The `examples/` directory contains one full guided document and focused examples
 for individual feature groups:
 
-- `example.tex`: all features together in one informal guide.
-- `core.tex`: list presets and text fields, with no optional package features.
-- `shortcuts.tex`: small-caps command generation through the `shortcuts` option.
-- `draft.tex`: todo notes and page extension through the `draft` option.
-- `theorems.tex`: theorem declarations, framed wrappers, stored theorems, and theorem lists.
+- `example.tssuite.overview.tex`: all features together in one informal guide.
+- `example.tssuite.core.tex`: list presets and text fields, with no optional package features.
+- `example.tssuite.shortcuts.tex`: small-caps command generation through the `shortcuts` option.
+- `example.tssuite.draft.tex`: todo notes and page extension through the `draft` option.
+- `example.tssuite.theorems.tex`: theorem declarations, framed wrappers, stored theorems, and theorem lists.
 
 Build examples from the `examples/` directory:
 
 ```sh
 cd examples
-latexmk -r latexmkrc example.tex
-latexmk -r latexmkrc core.tex shortcuts.tex draft.tex theorems.tex
+latexmk -r latexmkrc example.tssuite.overview.tex
+latexmk -r latexmkrc example.tssuite.core.tex example.tssuite.shortcuts.tex example.tssuite.draft.tex example.tssuite.theorems.tex
 ```
 
 The build writes auxiliary files to `examples/.build/` and final PDFs directly to
@@ -72,7 +72,7 @@ The build writes auxiliary files to `examples/.build/` and final PDFs directly t
 \MakeFramedTheorem{ftheorem}{theorem}
 ```
 
-See `examples/example.tex` for a guided document that explains each feature in
+See `examples/example.tssuite.overview.tex` for a guided document that explains each feature in
 context.
 
 ## Repository Layout
@@ -87,11 +87,11 @@ tssuite/
 │   ├── tssuite.shorthands.code.tex
 │   └── tssuite.theorems.code.tex
 └── examples/
-    ├── core.tex
-    ├── draft.tex
-    ├── example.tex
-    ├── shortcuts.tex
-    ├── theorems.tex
+    ├── example.tssuite.core.tex
+    ├── example.tssuite.draft.tex
+    ├── example.tssuite.overview.tex
+    ├── example.tssuite.shortcuts.tex
+    ├── example.tssuite.theorems.tex
     └── latexmkrc
 ```
 

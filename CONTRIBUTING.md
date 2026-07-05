@@ -12,7 +12,7 @@ tssuite/
 ├── code/
 │   └── tssuite.<module>.code.tex
 ├── examples/
-│   ├── example.tex
+│   ├── example.tssuite.overview.tex
 │   ├── latexmkrc
 │   └── .build/
 ├── README.md
@@ -26,7 +26,7 @@ Run example builds from the `examples/` directory:
 
 ```sh
 cd examples
-latexmk -r latexmkrc example.tex
+latexmk -r latexmkrc example.tssuite.overview.tex
 ```
 
 The build convention is:
@@ -67,7 +67,7 @@ Avoid comments that merely restate the next line of code.
 ## README And Examples
 
 - Keep `README.md` usable as the first point of reference.
-- Keep `examples/example.tex` compilable and explanatory.
+- Keep `examples/example.tssuite.overview.tex` compilable and explanatory.
 - Examples should demonstrate the package workflow, not only exercise commands.
 - If an option changes build requirements, document it in both the README and
   the example.
