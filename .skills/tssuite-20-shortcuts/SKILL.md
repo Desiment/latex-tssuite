@@ -1,3 +1,13 @@
+---
+name: tssuite-20-shortcuts
+description: Use tssuite small-caps text shortcuts for consistent inline terminology and abbreviations.
+license: MIT
+compatibility: opencode
+metadata:
+  package: tssuite
+  topic: shortcuts
+---
+
 # tssuite: Small-Caps Shortcuts
 
 ## When To Use

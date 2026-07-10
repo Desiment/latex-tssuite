@@ -1,3 +1,13 @@
+---
+name: tssuite-40-theorems
+description: Use tssuite theorem and framed theorem environments with the package's configured theorem styles.
+license: MIT
+compatibility: opencode
+metadata:
+  package: tssuite
+  topic: theorems
+---
+
 # tssuite: Theorems And Framed Theorems
 
 ## When To Use

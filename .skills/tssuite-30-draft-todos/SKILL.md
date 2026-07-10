@@ -1,3 +1,13 @@
+---
+name: tssuite-30-draft-todos
+description: Use tssuite draft todo commands for inline notes, missing content markers, and draft-only annotations.
+license: MIT
+compatibility: opencode
+metadata:
+  package: tssuite
+  topic: draft-todos
+---
+
 # tssuite: Draft Todos
 
 ## When To Use

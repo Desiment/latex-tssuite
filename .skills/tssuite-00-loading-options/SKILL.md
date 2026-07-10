@@ -1,3 +1,13 @@
+---
+name: tssuite-00-loading-options
+description: Load tssuite with the right options for lists, fields, shortcuts, draft todos, and theorem styles.
+license: MIT
+compatibility: opencode
+metadata:
+  package: tssuite
+  topic: loading-options
+---
+
 # tssuite: Loading And Options
 
 ## When To Use

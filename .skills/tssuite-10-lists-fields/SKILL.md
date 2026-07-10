@@ -1,3 +1,13 @@
+---
+name: tssuite-10-lists-fields
+description: Use tssuite list helpers and text field commands for compact lists and interactive document fields.
+license: MIT
+compatibility: opencode
+metadata:
+  package: tssuite
+  topic: lists-fields
+---
+
 # tssuite: Lists And Text Fields
 
 ## When To Use
